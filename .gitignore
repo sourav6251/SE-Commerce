@@ -1,0 +1,24 @@
+# Root .gitignore
+target/
+**/target/
+.mvn/wrapper/maven-wrapper.jar
+*.class
+.DS_Store
+
+# IDEs
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+
+# Node / Frontend
+node_modules/
+dist/
+build/
+.next/
+.turbo/
+*.log
