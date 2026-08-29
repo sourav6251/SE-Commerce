@@ -21,6 +21,9 @@ public class CategoryEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(nullable = false, unique = true, length = 50, updatable = false)
+    private String categoryCode;
+
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
