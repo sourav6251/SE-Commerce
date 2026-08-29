@@ -20,8 +20,8 @@ import java.util.List;
 public class ProductEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private CategoryEntity category;

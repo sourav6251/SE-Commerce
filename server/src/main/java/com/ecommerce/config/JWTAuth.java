@@ -51,6 +51,7 @@ public class JWTAuth extends OncePerRequestFilter {
 
         // TODO:Public endpoints
         boolean isPublicEndpoint = (path.startsWith("/auth/") && !path.equals("/auth/logout"))
+                || path.startsWith("/otp/")
                 || path.startsWith("/public/")
                 || path.startsWith("/user/")
                 || path.equals("/user");

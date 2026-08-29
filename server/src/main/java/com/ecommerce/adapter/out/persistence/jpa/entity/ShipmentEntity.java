@@ -17,8 +17,8 @@ import java.time.Instant;
 public class ShipmentEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(unique = true)

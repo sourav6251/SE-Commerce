@@ -17,8 +17,8 @@ import java.time.Instant;
 public class AddressEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private UserEntity user;

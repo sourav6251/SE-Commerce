@@ -14,7 +14,6 @@ public class Otp {
     }
 
     public static Otp generate() {
-
         String code = String.format(
                 "%06d",
                 ThreadLocalRandom.current().nextInt(0, 1_000_000)
@@ -25,8 +24,11 @@ public class Otp {
         return new Otp(code, expiresAt);
     }
 
-    public boolean isValid(String inputCode) {
+    public static Otp of(String code, Instant expiresAt) {
+        return new Otp(code, expiresAt);
+    }
 
+    public boolean isValid(String inputCode) {
         if (isExpired()) {
             return false;
         }
@@ -40,5 +42,9 @@ public class Otp {
 
     public String getCode() {
         return code;
+    }
+
+    public Instant getExpiresAt() {
+        return expiresAt;
     }
 }

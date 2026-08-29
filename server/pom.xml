@@ -77,11 +77,11 @@
         <!-- ========================= -->
         <!-- Session                    -->
         <!-- ========================= -->
-
+<!-- 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-session-jdbc</artifactId>
-        </dependency>
+        </dependency> -->
 
 
         <!-- ========================= -->
@@ -215,11 +215,11 @@
         <!-- Test - Session             -->
         <!-- ========================= -->
 
-        <dependency>
+        <!-- <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-session-jdbc-test</artifactId>
             <scope>test</scope>
-        </dependency>
+        </dependency> -->
 
 
         <!-- ========================= -->

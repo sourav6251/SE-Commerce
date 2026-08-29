@@ -1,5 +1,8 @@
 package com.ecommerce.adapter.out.persistence.jpa.entity;
 
+import com.ecommerce.adapter.out.persistence.enums.Role;
+import com.ecommerce.adapter.out.persistence.enums.Status;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -8,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 @Entity
 @Table(name = "users")
@@ -25,6 +29,7 @@ public class UserEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @JsonIgnore
     private String password;
 
     private String firstName;
@@ -33,9 +38,11 @@ public class UserEntity {
 
     private String phoneNumber;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

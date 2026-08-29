@@ -18,8 +18,8 @@ import java.util.List;
 public class CategoryEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
     @Column(nullable = false, unique = true, length = 100)
     private String name;
