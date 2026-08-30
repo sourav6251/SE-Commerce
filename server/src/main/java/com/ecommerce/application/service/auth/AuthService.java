@@ -1,34 +1,35 @@
 package com.ecommerce.application.service.auth;
 
 import com.ecommerce.adapter.in.web.auth.dto.SignupDTO;
+import com.ecommerce.adapter.in.web.auth.dto.UserDTO;
 import com.ecommerce.adapter.out.persistence.enums.Role;
 import com.ecommerce.adapter.out.persistence.enums.Status;
 import com.ecommerce.adapter.out.persistence.jpa.entity.UserEntity;
 import com.ecommerce.adapter.out.persistence.jpa.repository.UserRepository;
 import com.ecommerce.application.port.in.auth.AuthUseCase;
+import com.ecommerce.application.port.out.persistence.UserPort;
 import com.ecommerce.domain.exception.InvalidCredentialsException;
-import com.ecommerce.domain.exception.UserAlreadyExist;
+import com.ecommerce.domain.exception.UserAlreadyExistException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService implements AuthUseCase {
 
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserPort userPort;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
+    public AuthService(PasswordEncoder passwordEncoder,UserPort userPort) {
         this.passwordEncoder = passwordEncoder;
+        this.userPort = userPort;
     }
 
     @Override
-    public UserEntity signup(SignupDTO signupDTO) {
+    public UserDTO signup(SignupDTO signupDTO) {
 
-        userRepository.findByEmail(signupDTO.getEmail())
-                .ifPresent(user -> {
-                    throw new UserAlreadyExist("User exists with this email");
-                });
+        if (userPort.isUserExistByEmail(signupDTO.getEmail())) {
+            throw new UserAlreadyExistException("User exists with this email");
+        }
 
         UserEntity user = UserEntity.builder()
                 .email(signupDTO.getEmail())
@@ -39,15 +40,17 @@ public class AuthService implements AuthUseCase {
                 .status(Status.ACTIVE)
                 .build();
 
-        return userRepository.save(user);
+        return userPort.saveUser(user);
     }
 
     @Override
     public UserEntity login(SignupDTO signupDTO) {
 
-        // 1. Find user by email
-        UserEntity user = userRepository.findByEmail(signupDTO.getEmail())
-                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
+        if (userPort.isUserExistByEmail(signupDTO.getEmail())) {
+            throw new UserAlreadyExistException("User exists with this email");
+        }
+
+       UserEntity user= userPort.findUserByEmail(signupDTO.getEmail());
 
         // 2. Verify BCrypt password
         if (!passwordEncoder.matches(signupDTO.getPassword(), user.getPassword())) {

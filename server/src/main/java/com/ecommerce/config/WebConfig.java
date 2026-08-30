@@ -1,6 +1,6 @@
 package com.ecommerce.config;
 
-import com.ecommerce.adapter.in.web.auth.common.resolver.AccessTokenResolver;
+import com.ecommerce.annotation.resolver.AccessTokenResolver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

@@ -9,7 +9,7 @@ import com.ecommerce.application.port.in.auth.AuthUseCase;
 import com.ecommerce.config.JWTService;
 import com.ecommerce.domain.auth.ApiResponse;
 import com.ecommerce.domain.exception.InvalidCredentialsException;
-import com.ecommerce.domain.exception.UserAlreadyExist;
+import com.ecommerce.domain.exception.UserAlreadyExistException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -43,7 +43,7 @@ public class AuthenticationController {
         }
         try {
             signup.setEmail(jwtService.getUserID(token));
-            UserEntity user = authUseCase.signup(signup);
+            UserDTO user = authUseCase.signup(signup);
 
             Map<String, Object> claims = new HashMap<>();
             claims.put("role", user.getRole() != null ? user.getRole() : Role.CUSTOMER);
@@ -62,13 +62,13 @@ public class AuthenticationController {
                     .add("message", "Signup successfully.")
                     .add("isNewUser", true)
                     .add("token", authToken)
-                    .add("user", UserDTO.fromEntity(user));
+                    .add("user", user);
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, authCookie.toString())
                     .body(response);
 
-        } catch (UserAlreadyExist e) {
+        } catch (UserAlreadyExistException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Something went wrong. Try again."));
@@ -107,5 +107,22 @@ public class AuthenticationController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Something went wrong. Try again."));
         }
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout() {
+
+        ResponseCookie authCookie = ResponseCookie.from("AccessToken", "")
+                .httpOnly(true)
+                .secure(developmentMode.equalsIgnoreCase("PROD"))
+                .path("/")
+                .maxAge(0) // delete immediately
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, authCookie.toString())
+                .body(ApiResponse.success()
+                        .add("message", "Logged out successfully."));
     }
 }

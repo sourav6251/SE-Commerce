@@ -77,7 +77,7 @@
         <!-- ========================= -->
         <!-- Session                    -->
         <!-- ========================= -->
-<!-- 
+        <!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-session-jdbc</artifactId>
@@ -230,6 +230,32 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!-- ========================= -->
+        <!--      File Upload          -->
+        <!-- ========================= -->
+
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http5</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.imagekit</groupId>
+            <artifactId>image-kit-java</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+        <!-- ========================= -->
+        <!--      Video validator      -->
+        <!-- ========================= -->
+
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>3.2.3</version>
         </dependency>
 
     </dependencies>

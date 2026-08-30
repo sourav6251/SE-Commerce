@@ -7,19 +7,19 @@ import java.util.List;
 
 public interface CategoryUseCase {
 
-    CategoryEntity createCategory(CategoryDTO category);
+    CategoryDTO createCategory(CategoryDTO category);
 
-    CategoryEntity createSubCategory(CategoryDTO subCategory);
+    CategoryDTO createSubCategory(CategoryDTO subCategory);
 
-    CategoryEntity updateCategory(CategoryDTO category);
+    CategoryDTO updateCategory(CategoryDTO category);
 
     void deleteCategory(String id);
 
-    CategoryEntity getCategoryByCode(String code);
+    CategoryDTO getCategoryByCode(String code);
 
-    List<CategoryEntity> getAllCategories();
+    List<CategoryDTO> getAllCategories();
 
-    List<CategoryEntity> getAllRootCategories();
+    List<CategoryDTO> getAllRootCategories();
 
-    List<CategoryEntity> getSubCategoriesByParentId(String parentId);
+    List<CategoryDTO> getSubCategoriesByParentId(String parentId);
 }

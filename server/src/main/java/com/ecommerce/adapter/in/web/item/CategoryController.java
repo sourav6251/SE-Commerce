@@ -22,8 +22,8 @@ public class CategoryController {
     @PostMapping()
     public ResponseEntity<?> createCategory(@RequestBody CategoryDTO category) {
         try {
-            CategoryEntity categoryEntity = categoryUseCase.createCategory(category);
-            return ResponseEntity.ok().body(CategoryDTO.fromEntity(categoryEntity));
+            CategoryDTO categoryDTO = categoryUseCase.createCategory(category);
+            return ResponseEntity.ok().body(categoryDTO);
         } catch (CategotyExcaption e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -34,8 +34,8 @@ public class CategoryController {
     @PostMapping("/subcategory")
     public ResponseEntity<?> createSubCategory(@RequestBody CategoryDTO subCategory) {
         try {
-            CategoryEntity categoryEntity = categoryUseCase.createSubCategory(subCategory);
-            return ResponseEntity.ok().body(CategoryDTO.fromEntity(categoryEntity));
+            CategoryDTO categoryDTO = categoryUseCase.createSubCategory(subCategory);
+            return ResponseEntity.ok().body(categoryDTO);
         } catch (CategotyExcaption e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -46,8 +46,8 @@ public class CategoryController {
     @GetMapping()
     public ResponseEntity<?> getAllCategories() {
         try {
-            List<CategoryEntity> categoryEntities = categoryUseCase.getAllCategories();
-            return ResponseEntity.ok(categoryEntities.stream().map(CategoryDTO::fromEntity).toList());
+            List<CategoryDTO> categoryDTOList = categoryUseCase.getAllCategories();
+            return ResponseEntity.ok(categoryDTOList);
         } catch (CategotyExcaption e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -58,8 +58,8 @@ public class CategoryController {
     @GetMapping("/root")
     public ResponseEntity<?> getAllRootCategories() {
         try {
-            List<CategoryEntity> rootCategories = categoryUseCase.getAllRootCategories();
-            return ResponseEntity.ok(rootCategories.stream().map(CategoryDTO::fromEntity).toList());
+            List<CategoryDTO> categoryDTOList = categoryUseCase.getAllRootCategories();
+            return ResponseEntity.ok(categoryDTOList);
         } catch (CategotyExcaption e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -70,8 +70,8 @@ public class CategoryController {
     @GetMapping("/{parentId}/subcategories")
     public ResponseEntity<?> getSubCategories(@PathVariable("parentId") String parentId) {
         try {
-            List<CategoryEntity> subCategories = categoryUseCase.getSubCategoriesByParentId(parentId);
-            return ResponseEntity.ok(subCategories.stream().map(CategoryDTO::fromEntity).toList());
+            List<CategoryDTO> categoryDTOList = categoryUseCase.getSubCategoriesByParentId(parentId);
+            return ResponseEntity.ok(categoryDTOList);
         } catch (CategotyExcaption e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -94,8 +94,8 @@ public class CategoryController {
     @PutMapping()
     public ResponseEntity<?> updateCategory(@RequestBody CategoryDTO category) {
         try {
-            CategoryEntity categoryEntity = categoryUseCase.updateCategory(category);
-            return ResponseEntity.ok().body(CategoryDTO.fromEntity(categoryEntity));
+            CategoryDTO categoryDTO = categoryUseCase.updateCategory(category);
+            return ResponseEntity.ok().body(categoryDTO);
         } catch (CategotyExcaption e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {

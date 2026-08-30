@@ -38,15 +38,7 @@ public class OrderEntity {
     @Column(nullable = false, length = 50)
     private String paymentStatus;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<OrderItemEntity> items = new ArrayList<>();
 
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
-    private PaymentEntity payment;
-
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
-    private ShipmentEntity shipment;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

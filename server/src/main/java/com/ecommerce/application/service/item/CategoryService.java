@@ -2,8 +2,8 @@ package com.ecommerce.application.service.item;
 
 import com.ecommerce.adapter.in.web.item.dto.CategoryDTO;
 import com.ecommerce.adapter.out.persistence.jpa.entity.CategoryEntity;
-import com.ecommerce.adapter.out.persistence.jpa.repository.CategoryRepository;
 import com.ecommerce.application.port.in.Item.CategoryUseCase;
+import com.ecommerce.application.port.out.persistence.CategoryPort;
 import com.ecommerce.domain.exception.CategotyExcaption;
 import org.springframework.stereotype.Service;
 
@@ -12,28 +12,27 @@ import java.util.List;
 @Service
 public class CategoryService implements CategoryUseCase {
 
-    private final CategoryRepository categoryRepository;
+    private final CategoryPort categoryPort;
 
-    public CategoryService(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
+    public CategoryService( CategoryPort categoryPort) {
+        this.categoryPort = categoryPort;
     }
 
     @Override
-    public CategoryEntity createCategory(CategoryDTO category) {
+    public CategoryDTO createCategory(CategoryDTO category) {
+        try {
         if (category.getCategoryCode() == null || category.getCategoryCode().trim().isEmpty()) {
             throw new CategotyExcaption("Enter category code");
         }
-        if (categoryRepository.existsByCategoryCode(category.getCategoryCode())) {
+        if (categoryPort.isExistByCategoryCode(category.getCategoryCode())) {
             throw new CategotyExcaption("Category code already exists");
         }
 
         CategoryEntity parentEntity = null;
         if (category.getParentId() != null && !category.getParentId().trim().isEmpty()) {
-            parentEntity = categoryRepository.findById(category.getParentId())
-                    .orElseThrow(() -> new CategotyExcaption("Parent category not found with ID: " + category.getParentId()));
+            parentEntity = categoryPort.findByID(category.getParentId());
         }
 
-        try {
             CategoryEntity categoryEntity = CategoryEntity.builder()
                     .categoryCode(category.getCategoryCode())
                     .name(category.getName())
@@ -42,14 +41,16 @@ public class CategoryService implements CategoryUseCase {
                     .parent(parentEntity)
                     .build();
 
-            return categoryRepository.save(categoryEntity);
+            return CategoryDTO.fromEntity(categoryPort.saveCategory(categoryEntity));
+        } catch (CategotyExcaption e){
+            throw e;
         } catch (Exception e) {
             throw new CategotyExcaption("Error in creating category: " + e.getMessage());
         }
     }
 
     @Override
-    public CategoryEntity createSubCategory(CategoryDTO subCategory) {
+    public CategoryDTO createSubCategory(CategoryDTO subCategory) {
         if (subCategory.getParentId() == null || subCategory.getParentId().trim().isEmpty()) {
             throw new CategotyExcaption("Parent category ID is required to create a subcategory");
         }
@@ -57,40 +58,41 @@ public class CategoryService implements CategoryUseCase {
     }
 
     @Override
-    public CategoryEntity updateCategory(CategoryDTO category) {
-        if (category.getId() == null) {
-            throw new CategotyExcaption("Category ID is required for update");
-        }
-
-        CategoryEntity oldCategoryEntity = categoryRepository.findById(category.getId())
-                .orElseThrow(() -> new CategotyExcaption("Category not found"));
-
-        if (category.getCategoryCode() != null) {
-            CategoryEntity existingCategory = categoryRepository.findByCategoryCode(category.getCategoryCode());
-            if (existingCategory != null && !existingCategory.getId().equals(oldCategoryEntity.getId())) {
-                throw new CategotyExcaption("Category code already exists in another category");
-            }
-            oldCategoryEntity.setCategoryCode(category.getCategoryCode());
-        }
-
-        if (category.getName() != null) {
-            oldCategoryEntity.setName(category.getName());
-        }
-        if (category.getDescription() != null) {
-            oldCategoryEntity.setDescription(category.getDescription());
-        }
-        if (category.getSlug() != null) {
-            oldCategoryEntity.setSlug(category.getSlug());
-        }
-        if (category.getParentId() != null) {
-            CategoryEntity parent = categoryRepository.findById(category.getParentId())
-                    .orElseThrow(() -> new CategotyExcaption("Parent category not found with ID: " + category.getParentId()));
-            oldCategoryEntity.setParent(parent);
-        }
-
+    public CategoryDTO updateCategory(CategoryDTO category) {
         try {
-            return categoryRepository.save(oldCategoryEntity);
-        } catch (Exception e) {
+            if (category.getId() == null) {
+                throw new CategotyExcaption("Category ID is required for update");
+            }
+
+            CategoryEntity oldCategoryEntity = categoryPort.findByID(category.getId());
+
+            if (category.getCategoryCode() != null) {
+                CategoryEntity existingCategory = categoryPort.findByCategoryCode(category.getCategoryCode());
+                if (existingCategory != null && !existingCategory.getId().equals(oldCategoryEntity.getId())) {
+                    throw new CategotyExcaption("Category code already exists in another category");
+                }
+                oldCategoryEntity.setCategoryCode(category.getCategoryCode());
+            }
+
+            if (category.getName() != null) {
+                oldCategoryEntity.setName(category.getName());
+            }
+            if (category.getDescription() != null) {
+                oldCategoryEntity.setDescription(category.getDescription());
+            }
+            if (category.getSlug() != null) {
+                oldCategoryEntity.setSlug(category.getSlug());
+            }
+            if (category.getParentId() != null) {
+                CategoryEntity parent = categoryPort.findByID(category.getParentId());
+                oldCategoryEntity.setParent(parent);
+            }
+
+            return CategoryDTO.fromEntity(categoryPort.saveCategory(oldCategoryEntity));
+        }catch (CategotyExcaption e){
+            throw e;
+        }
+        catch (Exception e) {
             throw new CategotyExcaption("Error in updating category: " + e.getMessage());
         }
     }
@@ -98,43 +100,43 @@ public class CategoryService implements CategoryUseCase {
     @Override
     public void deleteCategory(String id) {
         try {
-            categoryRepository.deleteById(id);
+            categoryPort.deleteCategory(id);
         } catch (Exception e) {
             throw new CategotyExcaption("Error in deleting category: " + e.getMessage());
         }
     }
 
     @Override
-    public CategoryEntity getCategoryByCode(String code) {
+    public CategoryDTO getCategoryByCode(String code) {
         try {
-            return categoryRepository.findByCategoryCode(code);
+            return CategoryDTO.fromEntity(categoryPort.findByCategoryCode(code));
         } catch (Exception e) {
             throw new CategotyExcaption("Error in getting category by code: " + e.getMessage());
         }
     }
 
     @Override
-    public List<CategoryEntity> getAllCategories() {
+    public List<CategoryDTO> getAllCategories() {
         try {
-            return categoryRepository.findAll();
+            return categoryPort.findAllCategories().stream().map(CategoryDTO::fromEntity).toList();
         } catch (Exception e) {
             throw new CategotyExcaption("Error in getting categories");
         }
     }
 
     @Override
-    public List<CategoryEntity> getAllRootCategories() {
+    public List<CategoryDTO> getAllRootCategories() {
         try {
-            return categoryRepository.findByParentIsNull();
+            return categoryPort.findRootCategories().stream().map(CategoryDTO::fromEntity).toList();
         } catch (Exception e) {
             throw new CategotyExcaption("Error in getting root categories");
         }
     }
 
     @Override
-    public List<CategoryEntity> getSubCategoriesByParentId(String parentId) {
+    public List<CategoryDTO> getSubCategoriesByParentId(String parentId) {
         try {
-            return categoryRepository.findByParentId(parentId);
+            return categoryPort.findCategoryByParentCode(parentId).stream().map(CategoryDTO::fromEntity).toList();
         } catch (Exception e) {
             throw new CategotyExcaption("Error in getting subcategories for parent ID: " + parentId);
         }

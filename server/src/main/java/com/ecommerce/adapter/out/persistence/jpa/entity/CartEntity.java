@@ -26,9 +26,7 @@ public class CartEntity {
     @JoinColumn(unique = true)
     private UserEntity user;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<CartItemEntity> items = new ArrayList<>();
+
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

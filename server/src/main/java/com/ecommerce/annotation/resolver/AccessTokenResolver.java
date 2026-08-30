@@ -1,4 +1,4 @@
-package com.ecommerce.adapter.in.web.auth.common.resolver;
+package com.ecommerce.annotation.resolver;
 
 import com.ecommerce.annotation.AuthToken;
 import com.ecommerce.config.JWTService;

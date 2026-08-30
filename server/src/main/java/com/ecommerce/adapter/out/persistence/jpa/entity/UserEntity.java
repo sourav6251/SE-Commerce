@@ -44,9 +44,7 @@ public class UserEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<AddressEntity> addresses = new ArrayList<>();
+
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

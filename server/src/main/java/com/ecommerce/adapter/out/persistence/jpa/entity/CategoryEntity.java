@@ -36,7 +36,7 @@ public class CategoryEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private CategoryEntity parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private List<CategoryEntity> subCategories = new ArrayList<>();
 
