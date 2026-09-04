@@ -55,6 +55,12 @@ public class ProductEntity {
     @Column(nullable = false, length = 50)
     private String status;
 
+    private Double weight;
+
+    private Double height;
+
+    private Double width;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private Instant createdAt;

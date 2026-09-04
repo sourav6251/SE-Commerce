@@ -3,11 +3,11 @@ package com.ecommerce.adapter.in.web.auth.dto;
 
 import com.ecommerce.adapter.out.persistence.jpa.entity.UserEntity;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -19,6 +19,8 @@ public class UserDTO {
     private String lastName;
     private String phoneNumber;
     private String role;
+    private MultipartFile file;
+    private String profilePicture;
     private String status;
     private Instant createdAt;
     private Instant updatedAt;

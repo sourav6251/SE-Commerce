@@ -116,6 +116,15 @@ public class CategoryService implements CategoryUseCase {
     }
 
     @Override
+    public CategoryDTO getCategoryById(String id) {
+        try {
+            return CategoryDTO.fromEntity(categoryPort.findByID(id));
+        } catch (Exception e) {
+            throw new CategotyExcaption("Error in getting category by id: " + e.getMessage());
+        }
+    }
+
+    @Override
     public List<CategoryDTO> getAllCategories() {
         try {
             return categoryPort.findAllCategories().stream().map(CategoryDTO::fromEntity).toList();

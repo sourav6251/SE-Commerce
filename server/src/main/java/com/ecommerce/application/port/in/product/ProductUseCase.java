@@ -7,10 +7,11 @@ import java.util.List;
 public interface ProductUseCase {
 
     ProductDTO createProduct(ProductDTO productDTO);
-    ProductDTO updateProduct(ProductDTO productDTO);
-    void deleteProduct(Long id);
-    ProductDTO getProduct(Long id);
+    ProductDTO updateProduct(String id, ProductDTO productDTO);
+    void deleteProduct(String id);
+    ProductDTO getProduct(String id);
     List<ProductDTO> getAllProducts();
-    List<ProductDTO> getProductsByCategoryId(Long categoryId);
+    List<ProductDTO> getProductsByCategoryId(String categoryId);
     List<ProductDTO> getProductsByCategoryName(String categoryName);
 }
+

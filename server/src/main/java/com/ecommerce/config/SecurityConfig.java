@@ -1,6 +1,7 @@
 package com.ecommerce.config;
 
 
+import com.ecommerce.config.properties.JwtProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,9 +27,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JWTAuth jwtAuthFilter;
+    private final JwtProperties jwtProperties;
 
-    public SecurityConfig(JWTAuth jwtAuthFilter) {
+    public SecurityConfig(JWTAuth jwtAuthFilter,JwtProperties jwtProperties) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.jwtProperties = jwtProperties;
     }
 
     @Bean
@@ -39,7 +42,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/otp/**","/auth/**").permitAll()
+                                .requestMatchers(
+                                        "/otp/**",
+                                        "/auth/**",
+                                        "/v3/api-docs/**",
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html"
+                                ).permitAll()
 //                                .requestMatchers("/auth/logout").authenticated()
 //                                .requestMatchers("/auth/**", "/public/**", "/api/public/**", "/v3/**", "/swagger-ui/**",
 //                                        "/actuator/**",
@@ -71,13 +80,10 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Value("${app.cors.allowed-origins}")
-    private List<String> allowedOrigins;
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedOrigins(jwtProperties.getCors().getAllowedOrigins());
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("Authorization", "Set-Cookie"));

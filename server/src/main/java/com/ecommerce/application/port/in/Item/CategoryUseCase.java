@@ -17,6 +17,8 @@ public interface CategoryUseCase {
 
     CategoryDTO getCategoryByCode(String code);
 
+    CategoryDTO getCategoryById(String id);
+
     List<CategoryDTO> getAllCategories();
 
     List<CategoryDTO> getAllRootCategories();

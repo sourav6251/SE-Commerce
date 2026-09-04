@@ -1,5 +1,6 @@
 package com.ecommerce.config;
 
+import com.ecommerce.config.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -22,15 +23,17 @@ import java.util.Map;
 @Service
 public class JWTService {
 
-    @Value("${app.jwt.secret}")
-    private String jwtSecret;
-    @Value("${app.jwt.expiration-ms}")
-    private Integer expireTime;
+
     private SecretKey secretKey;
+    private final JwtProperties jwtProperties;
+
+    public JWTService(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+    }
 
     @PostConstruct
     private void init() {
-        this.secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+        this.secretKey = Keys.hmacShaKeyFor(jwtProperties.getJwt().getSecret().getBytes(StandardCharsets.UTF_8));
     }
 
     public boolean isValid(String token) {
@@ -122,7 +125,7 @@ public class JWTService {
     }
 
     public String generateToken(String userId, Map<String, Object> claims) {
-        return this.generateToken(userId, claims, expireTime);
+        return this.generateToken(userId, claims, jwtProperties.getJwt().getExpirationMs());
     }
 
     public String generateToken(String userId) {

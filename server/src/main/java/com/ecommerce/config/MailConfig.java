@@ -1,6 +1,6 @@
 package com.ecommerce.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.ecommerce.adapter.out.notification.properties.NotificationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,46 +11,35 @@ import java.util.Properties;
 @Configuration
 public class MailConfig {
 
-    @Value("${mail.host}")
-    private String host;
-    @Value("${mail.port}")
-    private Integer port;
-    @Value("${mail.username}")
-    private String username;
-    @Value("${mail.password}")
-    private String password;
-    @Value("${mail.protocol:smtp}")
-    private String protocol;
-    @Value("${mail.auth:true}")
-    private String auth;
-    @Value("${mail.isTlsEnable:true}")
-    private Boolean isTlsEnable;
-    @Value("${mail.isDebug:true}")
-    private Boolean isDebug;
+    private final NotificationProperties notificationProperties;
+
+    public MailConfig(NotificationProperties notificationProperties) {
+        this.notificationProperties = notificationProperties;
+    }
 
     @Bean
     public JavaMailSender javaMailSender() {
 
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
-        mailSender.setHost(host);
-        mailSender.setPort(port);
+        mailSender.setHost(notificationProperties.getMail().getHost());
+        mailSender.setPort(notificationProperties.getMail().getPort());
 
-        mailSender.setUsername(username);
-        mailSender.setPassword(password);
+        mailSender.setUsername(notificationProperties.getMail().getUsername());
+        mailSender.setPassword(notificationProperties.getMail().getPassword());
 
         Properties properties = mailSender.getJavaMailProperties();
 
-        properties.put("mail.transport.protocol", protocol);
-        properties.put("mail.smtp.auth", auth);
-        properties.put("mail.debug", isDebug);
+        properties.put("mail.transport.protocol", notificationProperties.getMail().getProtocol());
+        properties.put("mail.smtp.auth", notificationProperties.getMail().getAuth());
+        properties.put("mail.debug", notificationProperties.getMail().getIsDebug());
 
-        if (port != null && port == 465) {
+        if (notificationProperties.getMail().getPort() != null && notificationProperties.getMail().getPort() == 465) {
             properties.put("mail.smtp.ssl.enable", "true");
             properties.put("mail.smtp.socketFactory.port", "465");
             properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         } else {
-            properties.put("mail.smtp.starttls.enable", isTlsEnable);
+            properties.put("mail.smtp.starttls.enable", notificationProperties.getMail().getIsTlsEnable());
         }
 
         return mailSender;

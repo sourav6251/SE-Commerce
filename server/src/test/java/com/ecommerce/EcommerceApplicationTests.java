@@ -2,9 +2,10 @@ package com.ecommerce;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.ecommerce.adapter.out.storage.cloudinary.CloudinaryStorageAdapter;
 import com.ecommerce.adapter.out.storage.cloudinary.dto.FileUploadResponseDTO;
-import com.ecommerce.application.port.out.notification.MailSender;
+import com.ecommerce.application.port.out.notification.NotificationChannel;
+import com.ecommerce.application.port.out.notification.NotificationPort;
+import com.ecommerce.application.port.out.notification.NotificationRequest;
 import com.ecommerce.application.port.out.storage.FileStoragePort;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +22,13 @@ import java.io.IOException;
 @ActiveProfiles("dev")
 class EcommerceApplicationTests {
 
-//    @Autowired
-    private MailSender mailSender;
-//     @Autowired
+    private final NotificationPort notificationPort;
     private final FileStoragePort fileStoragePort;
 
-    public EcommerceApplicationTests(FileStoragePort fileStoragePort, MailSender mailSender) {
+    @Autowired
+    public EcommerceApplicationTests(FileStoragePort fileStoragePort, NotificationPort notificationPort) {
         this.fileStoragePort = fileStoragePort;
-        this.mailSender = mailSender;
+        this.notificationPort = notificationPort;
     }
 
     @Test
@@ -37,11 +37,12 @@ class EcommerceApplicationTests {
 
     @Test
     void testSendMail() {
-        mailSender.sendMail(
-                "dassourav3738@gmail.com",
-                "Test Email from E-Commerce App",
-                "<h1>Hello Sourav!</h1><p>This is a test email sent from your Spring Boot E-Commerce application.</p>"
-        );
+        notificationPort.send(NotificationRequest.builder()
+                .channel(NotificationChannel.EMAIL)
+                .recipient("dassourav3738@gmail.com")
+                .subject("Test Email from E-Commerce App")
+                .content("<h1>Hello Sourav!</h1><p>This is a test email sent from your Spring Boot E-Commerce application.</p>")
+                .build());
     }
 
     @Test

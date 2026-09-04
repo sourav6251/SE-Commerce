@@ -1,9 +1,11 @@
 package com.ecommerce.adapter.in.web.item;
 
 import com.ecommerce.adapter.in.web.item.dto.CategoryDTO;
-import com.ecommerce.adapter.out.persistence.jpa.entity.CategoryEntity;
 import com.ecommerce.application.port.in.Item.CategoryUseCase;
+import com.ecommerce.domain.auth.ApiResponse;
 import com.ecommerce.domain.exception.CategotyExcaption;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,23 +13,23 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/category")
+@RequiredArgsConstructor
 public class CategoryController {
 
     private final CategoryUseCase categoryUseCase;
-
-    public CategoryController(CategoryUseCase categoryUseCase) {
-        this.categoryUseCase = categoryUseCase;
-    }
 
     @PostMapping()
     public ResponseEntity<?> createCategory(@RequestBody CategoryDTO category) {
         try {
             CategoryDTO categoryDTO = categoryUseCase.createCategory(category);
-            return ResponseEntity.ok().body(categoryDTO);
+            ApiResponse response = ApiResponse.success()
+                    .add("message", "Category created successfully.")
+                    .add("category", categoryDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (CategotyExcaption e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Something went wrong");
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Something went wrong"));
         }
     }
 
@@ -35,11 +37,14 @@ public class CategoryController {
     public ResponseEntity<?> createSubCategory(@RequestBody CategoryDTO subCategory) {
         try {
             CategoryDTO categoryDTO = categoryUseCase.createSubCategory(subCategory);
-            return ResponseEntity.ok().body(categoryDTO);
+            ApiResponse response = ApiResponse.success()
+                    .add("message", "Subcategory created successfully.")
+                    .add("category", categoryDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (CategotyExcaption e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Something went wrong");
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Something went wrong"));
         }
     }
 
@@ -47,11 +52,41 @@ public class CategoryController {
     public ResponseEntity<?> getAllCategories() {
         try {
             List<CategoryDTO> categoryDTOList = categoryUseCase.getAllCategories();
-            return ResponseEntity.ok(categoryDTOList);
+            ApiResponse response = ApiResponse.success()
+                    .add("categories", categoryDTOList);
+            return ResponseEntity.ok(response);
         } catch (CategotyExcaption e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Something went wrong");
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Something went wrong"));
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getCategoryById(@PathVariable("id") String id) {
+        try {
+            CategoryDTO categoryDTO = categoryUseCase.getCategoryById(id);
+            ApiResponse response = ApiResponse.success()
+                    .add("category", categoryDTO);
+            return ResponseEntity.ok(response);
+        } catch (CategotyExcaption e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Something went wrong"));
+        }
+    }
+
+    @GetMapping("/code/{code}")
+    public ResponseEntity<?> getCategoryByCode(@PathVariable("code") String code) {
+        try {
+            CategoryDTO categoryDTO = categoryUseCase.getCategoryByCode(code);
+            ApiResponse response = ApiResponse.success()
+                    .add("category", categoryDTO);
+            return ResponseEntity.ok(response);
+        } catch (CategotyExcaption e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Something went wrong"));
         }
     }
 
@@ -59,11 +94,13 @@ public class CategoryController {
     public ResponseEntity<?> getAllRootCategories() {
         try {
             List<CategoryDTO> categoryDTOList = categoryUseCase.getAllRootCategories();
-            return ResponseEntity.ok(categoryDTOList);
+            ApiResponse response = ApiResponse.success()
+                    .add("categories", categoryDTOList);
+            return ResponseEntity.ok(response);
         } catch (CategotyExcaption e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Something went wrong");
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Something went wrong"));
         }
     }
 
@@ -71,23 +108,27 @@ public class CategoryController {
     public ResponseEntity<?> getSubCategories(@PathVariable("parentId") String parentId) {
         try {
             List<CategoryDTO> categoryDTOList = categoryUseCase.getSubCategoriesByParentId(parentId);
-            return ResponseEntity.ok(categoryDTOList);
+            ApiResponse response = ApiResponse.success()
+                    .add("categories", categoryDTOList);
+            return ResponseEntity.ok(response);
         } catch (CategotyExcaption e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Something went wrong");
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Something went wrong"));
         }
     }
 
-    @DeleteMapping()
-    public ResponseEntity<?> deleteCategory(@RequestBody CategoryDTO category) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCategory(@PathVariable("id") String id) {
         try {
-            categoryUseCase.deleteCategory(category.getId());
-            return ResponseEntity.noContent().build();
+            categoryUseCase.deleteCategory(id);
+            ApiResponse response = ApiResponse.success()
+                    .add("message", "Category deleted successfully.");
+            return ResponseEntity.ok(response);
         } catch (CategotyExcaption e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Something went wrong");
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Something went wrong"));
         }
     }
 
@@ -95,11 +136,30 @@ public class CategoryController {
     public ResponseEntity<?> updateCategory(@RequestBody CategoryDTO category) {
         try {
             CategoryDTO categoryDTO = categoryUseCase.updateCategory(category);
-            return ResponseEntity.ok().body(categoryDTO);
+            ApiResponse response = ApiResponse.success()
+                    .add("message", "Category updated successfully.")
+                    .add("category", categoryDTO);
+            return ResponseEntity.ok(response);
         } catch (CategotyExcaption e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Something went wrong");
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Something went wrong"));
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCategoryById(@PathVariable("id") String id, @RequestBody CategoryDTO category) {
+        try {
+            category.setId(id);
+            CategoryDTO categoryDTO = categoryUseCase.updateCategory(category);
+            ApiResponse response = ApiResponse.success()
+                    .add("message", "Category updated successfully.")
+                    .add("category", categoryDTO);
+            return ResponseEntity.ok(response);
+        } catch (CategotyExcaption e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Something went wrong"));
         }
     }
 }

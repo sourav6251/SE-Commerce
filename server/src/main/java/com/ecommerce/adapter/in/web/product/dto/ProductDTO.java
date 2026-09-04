@@ -26,6 +26,9 @@ public class ProductDTO {
     private BigDecimal price;
     private Integer stockQuantity;
     private String status;
+    private Double weight;
+    private Double height;
+    private Double width;
     private List<MultipartFile> images;
     @Builder.Default
     private List<String> imagesList = new ArrayList<>();
@@ -45,6 +48,9 @@ public class ProductDTO {
                 .price(entity.getPrice())
                 .stockQuantity(entity.getStockQuantity())
                 .status(entity.getStatus())
+                .weight(entity.getWeight())
+                .height(entity.getHeight())
+                .width(entity.getWidth())
                 .createdAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt())
                 .build();

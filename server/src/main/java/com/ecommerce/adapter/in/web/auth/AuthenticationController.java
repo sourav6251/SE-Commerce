@@ -7,10 +7,10 @@ import com.ecommerce.adapter.out.persistence.jpa.entity.UserEntity;
 import com.ecommerce.annotation.AuthToken;
 import com.ecommerce.application.port.in.auth.AuthUseCase;
 import com.ecommerce.config.JWTService;
+import com.ecommerce.config.properties.JwtProperties;
 import com.ecommerce.domain.auth.ApiResponse;
 import com.ecommerce.domain.exception.InvalidCredentialsException;
 import com.ecommerce.domain.exception.UserAlreadyExistException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -24,15 +24,14 @@ import java.util.Map;
 @RequestMapping("/auth")
 public class AuthenticationController {
 
-    @Value("${app.application-mode}")
-    private String developmentMode;
-
     public final JWTService jwtService;
     public final AuthUseCase authUseCase;
+    private final JwtProperties jwtProperties;
 
-    public AuthenticationController(JWTService jwtService, AuthUseCase authUseCase) {
+    public AuthenticationController(JWTService jwtService, AuthUseCase authUseCase,JwtProperties jwtProperties) {
         this.jwtService = jwtService;
         this.authUseCase = authUseCase;
+        this.jwtProperties = jwtProperties;
     }
 
     @PostMapping("/signup")
@@ -52,7 +51,7 @@ public class AuthenticationController {
 
             ResponseCookie authCookie = ResponseCookie.from("AccessToken", authToken)
                     .httpOnly(true)
-                    .secure(developmentMode.equalsIgnoreCase("PROD"))
+                    .secure(jwtProperties.applicationMode.equalsIgnoreCase("PROD"))
                     .path("/")
                     .maxAge(86400 * 7) // 7 days
                     .sameSite("Lax")
@@ -87,7 +86,7 @@ public class AuthenticationController {
 
             ResponseCookie authCookie = ResponseCookie.from("AccessToken", authToken)
                     .httpOnly(true)
-                    .secure(developmentMode.equalsIgnoreCase("PROD"))
+                    .secure(jwtProperties.applicationMode.equalsIgnoreCase("PROD"))
                     .path("/")
                     .maxAge(86400 * 7) // 7 days
                     .sameSite("Lax")
@@ -114,7 +113,7 @@ public class AuthenticationController {
 
         ResponseCookie authCookie = ResponseCookie.from("AccessToken", "")
                 .httpOnly(true)
-                .secure(developmentMode.equalsIgnoreCase("PROD"))
+                .secure(jwtProperties.applicationMode.equalsIgnoreCase("PROD"))
                 .path("/")
                 .maxAge(0) // delete immediately
                 .sameSite("Lax")

@@ -2,37 +2,27 @@ package com.ecommerce.config;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.ecommerce.config.properties.StorageProperties;
 import io.imagekit.client.ImageKitClient;
 import io.imagekit.client.okhttp.ImageKitOkHttpClient;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@AllArgsConstructor
 public class FileUploadConfig {
 
-    @Value("${storage.url:}")
-    private String storageUrl;
-    @Value("${storage.cloudName:}")
-    private String cloudName;
-    @Value("${storage.api.key:}")
-    private String apiKey;
-    @Value("${storage.api.secret:}")
-    private String apiSecret;
-
-    @Value("${storage.imagekit.privateKey}")
-    private String imagekitPrivateKey;
-
-    @Value("${storage.imagekit.webhookSecret}")
-    private String imagekitWebhookSecret;
+    private final StorageProperties storageProperties;
 
     @Bean
     public Cloudinary cloudinary() {
         return new Cloudinary(
                 ObjectUtils.asMap(
-                        "cloud_name", cloudName,
-                        "api_key", apiKey,
-                        "api_secret", apiSecret,
+                        "cloud_name", storageProperties.getCloudinary().getCloudName(),
+                        "api_key", storageProperties.getCloudinary().getApiKey(),
+                        "api_secret", storageProperties.getCloudinary().getApiSecret(),
                         "secure", true));
     }
 
@@ -40,7 +30,7 @@ public class FileUploadConfig {
     public ImageKitClient imageKitClient() {
 
         return ImageKitOkHttpClient.builder()
-                .privateKey(imagekitPrivateKey)
+                .privateKey(storageProperties.getImagekit().getPrivateKey())
 //                .webhookSecret(webhookSecret)
                 .build();
     }

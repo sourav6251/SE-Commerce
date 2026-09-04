@@ -7,13 +7,13 @@ import com.ecommerce.adapter.out.persistence.jpa.repository.UserRepository;
 import com.ecommerce.annotation.AuthToken;
 import com.ecommerce.application.port.in.otp.OtpUseCase;
 import com.ecommerce.config.JWTService;
+import com.ecommerce.config.properties.JwtProperties;
 import com.ecommerce.domain.auth.ApiResponse;
 import com.ecommerce.domain.exception.InvalidOtpException;
 import com.ecommerce.domain.exception.OtpExpiredException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -29,17 +29,16 @@ import java.util.Optional;
 @RequestMapping("/otp")
 public class OTPController {
 
-    @Value("${app.application-mode}")
-    private String developmentMode;
-
     private final OtpUseCase otpUseCase;
     private final JWTService jwtService;
     private final UserRepository userRepository;
+    private final JwtProperties jwtProperties;
 
-    public OTPController(OtpUseCase otpUseCase, JWTService jwtService, UserRepository userRepository) {
+    public OTPController(OtpUseCase otpUseCase, JWTService jwtService, UserRepository userRepository, JwtProperties jwtProperties) {
         this.otpUseCase = otpUseCase;
         this.jwtService = jwtService;
         this.userRepository = userRepository;
+        this.jwtProperties = jwtProperties;
     }
 
     @GetMapping("/send")
@@ -52,15 +51,15 @@ public class OTPController {
 
             ResponseCookie cookie = ResponseCookie.from("otp_token", token)
                     .httpOnly(true)
-                    .secure(developmentMode.equalsIgnoreCase("PROD"))
+                    .secure(jwtProperties.applicationMode.equalsIgnoreCase("PROD"))
                     .path("/")
                     .maxAge(300)
                     .sameSite("Lax")
                     .build();
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "success");
-            response.put("token", token);
+            ApiResponse response = ApiResponse.success()
+                    .add("message", "OTP sent successfully.")
+                    .add("token", token);
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, cookie.toString())
@@ -69,7 +68,7 @@ public class OTPController {
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("OTP generation failed");
+                    .body(ApiResponse.error("OTP generation failed"));
         }
     }
 
@@ -102,7 +101,7 @@ public class OTPController {
 
                 ResponseCookie authCookie = ResponseCookie.from("AccessToken", authToken)
                         .httpOnly(true)
-                        .secure(developmentMode.equalsIgnoreCase("PROD"))
+                        .secure(jwtProperties.applicationMode.equalsIgnoreCase("PROD"))
                         .path("/")
                         .maxAge(86400 * 7) // 7 days
                         .sameSite("Lax")
@@ -124,7 +123,7 @@ public class OTPController {
 
                 ResponseCookie signupCookie = ResponseCookie.from("signup_token", signUpToken)
                         .httpOnly(true)
-                        .secure(developmentMode.equalsIgnoreCase("PROD"))
+                        .secure(jwtProperties.applicationMode.equalsIgnoreCase("PROD"))
                         .path("/")
                         .maxAge(1800)
                         .sameSite("Lax")
@@ -155,9 +154,7 @@ public class OTPController {
 
         try {
             if (!jwtService.isValid(token)) {
-                Map<String, Object> response = new HashMap<>();
-                response.put("message", "OTP expired, please request again");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error("OTP expired, please request again"));
             }
 
             String email = jwtService.getUserID(token);
@@ -165,20 +162,14 @@ public class OTPController {
 
             otpUseCase.verify(email, otp);
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "success");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.success().add("message", "OTP verified successfully."));
 
         } catch (ExpiredJwtException | OtpExpiredException e) {
             log.warn("OTP expired: {}", e.getMessage());
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "OTP expired, please request again");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error("OTP expired, please request again"));
         } catch (InvalidOtpException | JwtException e) {
             log.warn("Invalid OTP or Token: {}", e.getMessage());
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.error(e.getMessage()));
         }
     }
 }
