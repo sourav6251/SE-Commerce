@@ -1,5 +1,7 @@
 package com.ecommerce.adapter.out.persistence.jpa.entity;
 
+import com.ecommerce.adapter.out.persistence.enums.PaymentMethod;
+import com.ecommerce.adapter.out.persistence.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,16 +26,20 @@ public class PaymentEntity {
     @JoinColumn(unique = true)
     private OrderEntity order;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private String paymentMethod;
+    @Builder.Default
+    private PaymentMethod paymentMethod = PaymentMethod.COD;
 
     private String gatewayTransactionId;
 
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private String status;
+    @Builder.Default
+    private PaymentStatus status = PaymentStatus.PENDING;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

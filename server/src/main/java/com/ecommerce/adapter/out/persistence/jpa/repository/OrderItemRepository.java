@@ -1,0 +1,12 @@
+package com.ecommerce.adapter.out.persistence.jpa.repository;
+
+import com.ecommerce.adapter.out.persistence.jpa.entity.OrderItemEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface OrderItemRepository extends JpaRepository<OrderItemEntity, String> {
+
+    List<OrderItemEntity> findByOrderId(String orderId);
+}
+

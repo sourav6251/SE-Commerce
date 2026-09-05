@@ -1,7 +1,10 @@
 package com.ecommerce.adapter.out.persistence.jpa.entity;
 
+import com.ecommerce.adapter.out.persistence.enums.OrderStatus;
+import com.ecommerce.adapter.out.persistence.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -32,11 +35,16 @@ public class OrderEntity {
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal totalAmount;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private String orderStatus;
+    @Builder.Default
+    private OrderStatus orderStatus = OrderStatus.PENDING;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private String paymentStatus;
+    @Builder.Default
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+
 
 
 
